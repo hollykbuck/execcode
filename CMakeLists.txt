@@ -6,7 +6,7 @@ find_package(spdlog REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(P2300 REQUIRED)
 
-add_executable(stdexec-tests
+set(STDEXEC_TEST_SOURCES
   tests/main.cpp
   tests/test_basics.cpp
   tests/test_thread_pool.cpp
@@ -41,9 +41,13 @@ add_executable(stdexec-tests
   tests/test_async_mutex.cpp
   tests/test_async_pass.cpp
   tests/test_async_mutex_v2.cpp
-   tests/test_async_manual_reset_event.cpp
-   tests/test_io_uring_context.cpp
+  tests/test_async_manual_reset_event.cpp
 )
+if(NOT WIN32)
+  list(APPEND STDEXEC_TEST_SOURCES tests/test_io_uring_context.cpp)
+endif()
+
+add_executable(stdexec-tests ${STDEXEC_TEST_SOURCES})
 
 target_link_libraries(stdexec-tests
   PRIVATE
