@@ -4,7 +4,7 @@ catch2/3.15.1
 nlohmann_json/3.12.0
 abseil/20260107.1
 boost/1.91.0
-p2300/5854e8205248ccbf1b93c3c37b22eeaabf6038f7
+p2300/086ccb28f85dcd7103247b6b56db540083e3a556
 re2/20251105
 
 [generators]
@@ -17,3 +17,4 @@ cmake_layout
 [options]
 boost/*:without_cobalt=True
 p2300/*:enable_asio=True
+p2300/*:parallel_scheduler=True
