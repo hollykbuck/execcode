@@ -43,7 +43,7 @@ set(STDEXEC_TEST_SOURCES
   tests/test_async_mutex_v2.cpp
   tests/test_async_manual_reset_event.cpp
 )
-if(NOT WIN32)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   list(APPEND STDEXEC_TEST_SOURCES tests/test_io_uring_context.cpp)
 endif()
 
