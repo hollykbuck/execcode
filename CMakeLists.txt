@@ -41,7 +41,8 @@ add_executable(stdexec-tests
   tests/test_async_mutex.cpp
   tests/test_async_pass.cpp
   tests/test_async_mutex_v2.cpp
-  tests/test_async_manual_reset_event.cpp
+   tests/test_async_manual_reset_event.cpp
+   tests/test_io_uring_context.cpp
 )
 
 target_link_libraries(stdexec-tests
