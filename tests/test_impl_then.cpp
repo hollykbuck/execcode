@@ -176,7 +176,7 @@ TEST_CASE("impl then: string transform", "[impl_then]") {
 }
 
 TEST_CASE("impl then: on scheduler via starts_on", "[impl_then]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
   auto [v] = ex::sync_wait(
     ex::starts_on(sch, then_sender{ex::just(36), [](int x) { return x + 6; }})
   ).value();

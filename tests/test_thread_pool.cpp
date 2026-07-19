@@ -23,7 +23,7 @@ TEST_CASE("static_thread_pool executes work on pool threads", "[thread_pool]") {
 }
 
 TEST_CASE("inline_scheduler executes synchronously", "[thread_pool][inline]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
 
   std::thread::id caller_id = std::this_thread::get_id();
   std::thread::id work_id;

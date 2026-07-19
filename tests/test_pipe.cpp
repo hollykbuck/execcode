@@ -5,7 +5,7 @@
 namespace ex = stdexec;
 
 TEST_CASE("operator| chains sender adaptors", "[pipe]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
 
   // Pipeline style
   auto [v] = ex::sync_wait(
@@ -19,7 +19,7 @@ TEST_CASE("operator| chains sender adaptors", "[pipe]") {
 }
 
 TEST_CASE("pipe syntax equals function call syntax", "[pipe]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
 
   auto pipe_result = ex::sync_wait(
     ex::schedule(sch) | ex::then([] { return 42; })

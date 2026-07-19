@@ -28,7 +28,7 @@ TEST_CASE("get_domain from scheduler's get_env", "[domain]") {
 }
 
 TEST_CASE("get_domain from inline_scheduler", "[domain]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
   auto env = ex::get_env(sch);
   auto dom = ex::get_domain(env);
   (void)dom;

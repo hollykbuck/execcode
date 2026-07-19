@@ -25,7 +25,7 @@ TEST_CASE("starts_on launches work on a specific scheduler", "[starts_on]") {
 }
 
 TEST_CASE("starts_on with inline scheduler runs synchronously", "[starts_on]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
 
   std::thread::id caller = std::this_thread::get_id();
   std::thread::id worker;
