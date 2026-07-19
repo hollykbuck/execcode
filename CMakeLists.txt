@@ -24,6 +24,8 @@ add_executable(stdexec-tests
   tests/test_write_env.cpp
   tests/test_stop_token.cpp
   tests/test_run_loop.cpp
+  tests/test_server_let.cpp
+  tests/test_server_on.cpp
   tests/test_impl_then.cpp
   tests/test_impl_retry.cpp
   tests/test_intro_read.cpp
