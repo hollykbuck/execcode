@@ -26,6 +26,9 @@ add_executable(stdexec-tests
   tests/test_run_loop.cpp
   tests/test_impl_then.cpp
   tests/test_impl_retry.cpp
+  tests/test_intro_read.cpp
+  tests/test_intro_scan.cpp
+  tests/test_intro_socket.cpp
   tests/test_custom_scheduler.cpp
   tests/test_env_query.cpp
   tests/test_domain.cpp
