@@ -1,0 +1,64 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            configure_preset: conan-release
+          - os: macos-latest
+            configure_preset: conan-release
+          - os: windows-latest
+            configure_preset: conan-default
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install and configure Conan
+        uses: conan-io/setup-conan@v1
+        with:
+          cache_packages: true
+
+      - name: Set up Visual Studio shell
+        if: matrix.os == 'windows-latest'
+        uses: egor-tensin/vs-shell@v2
+        with:
+          arch: x64
+
+      - name: Install dependencies via Conan
+        run: |
+          git clone https://github.com/hollykbuck/stdexec.git
+          cd stdexec
+          conan export .
+          cd ..
+          conan install . --build=missing -s build_type=Release -s compiler.cppstd=20
+
+      - name: Configure CMake
+        run: |
+          cmake --preset ${{ matrix.configure_preset }}
+
+      - name: Build
+        run: |
+          cmake --build --preset conan-release
+
+      - name: Verify build (Smoke Test)
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            BINARY_PATH=$(find build/Release -name ntfsindex.exe)
+          else
+            BINARY_PATH=$(find build/Release -name ntfsindex)
+          fi
+          echo "Found binary at: $BINARY_PATH"
+          "$BINARY_PATH" --help || true

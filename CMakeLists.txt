@@ -1,0 +1,62 @@
+cmake_minimum_required(VERSION 3.25)
+project(stdexec-tutorials VERSION 1.0.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+find_package(Catch2 REQUIRED)
+find_package(spdlog QUIET)
+find_package(nlohmann_json QUIET)
+
+find_package(P2300 REQUIRED)
+
+message(STATUS "Found p2300 target: ${p2300_TARGET}")
+
+add_executable(stdexec-tests
+  tests/main.cpp
+  tests/test_basics.cpp
+  tests/test_thread_pool.cpp
+  tests/test_pipe.cpp
+  tests/test_coroutine.cpp
+  tests/test_receiver.cpp
+  tests/test_completion_signatures.cpp
+  tests/test_then_upon.cpp
+  tests/test_let_value.cpp
+  tests/test_starts_on.cpp
+  tests/test_when_all.cpp
+  tests/test_bulk.cpp
+  tests/test_into_variant.cpp
+  tests/test_spawn_scope.cpp
+  tests/test_write_env.cpp
+  tests/test_stop_token.cpp
+  tests/test_run_loop.cpp
+  tests/test_impl_then.cpp
+  tests/test_impl_retry.cpp
+  tests/test_custom_scheduler.cpp
+  tests/test_env_query.cpp
+  tests/test_domain.cpp
+  tests/test_cpo.cpp
+  tests/test_parallel_scheduler.cpp
+  tests/test_windows_thread_pool.cpp
+  tests/test_beast_server.cpp
+  tests/test_async_mutex.cpp
+  tests/test_async_pass.cpp
+  tests/test_async_mutex_v2.cpp
+  tests/test_async_manual_reset_event.cpp
+)
+
+target_link_libraries(stdexec-tests
+  PRIVATE
+    Catch2::Catch2WithMain
+    p2300::p2300
+    Boost::headers
+)
+
+target_link_libraries(stdexec-tests PRIVATE spdlog::spdlog)
+target_link_libraries(stdexec-tests PRIVATE nlohmann_json::nlohmann_json)
+target_compile_features(stdexec-tests PRIVATE cxx_std_20)
+# target_include_directories(stdexec-tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+include(CTest)
+add_test(NAME stdexec-tests COMMAND stdexec-tests)
