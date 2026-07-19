@@ -19,7 +19,7 @@ jobs:
           - os: macos-latest
             configure_preset: conan-release
           - os: windows-latest
-            configure_preset: conan-default
+            configure_preset: conan-release
 
     steps:
       - name: Checkout repository
@@ -40,9 +40,10 @@ jobs:
         run: |
           git clone https://github.com/hollykbuck/stdexec.git
           cd stdexec
+          git checkout 5854e8205248ccbf1b93c3c37b22eeaabf6038f7
           conan export .
           cd ..
-          conan install . --build=missing -s build_type=Release -s compiler.cppstd=20
+          conan install . --build=missing -s build_type=Release -s compiler.cppstd=20  -c="tools.cmake.cmaketoolchain:generator=Ninja"
 
       - name: Configure CMake
         run: |
@@ -52,13 +53,5 @@ jobs:
         run: |
           cmake --build --preset conan-release
 
-      - name: Verify build (Smoke Test)
-        shell: bash
-        run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            BINARY_PATH=$(find build/Release -name ntfsindex.exe)
-          else
-            BINARY_PATH=$(find build/Release -name ntfsindex)
-          fi
-          echo "Found binary at: $BINARY_PATH"
-          "$BINARY_PATH" --help || true
+      - name: Run tests
+        run: ctest --preset ${{ matrix.configure_preset }} --output-on-failure
