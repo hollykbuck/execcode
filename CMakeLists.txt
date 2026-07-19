@@ -1,17 +1,10 @@
 cmake_minimum_required(VERSION 3.25)
 project(stdexec-tutorials VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
 find_package(Catch2 REQUIRED)
-find_package(spdlog QUIET)
-find_package(nlohmann_json QUIET)
-
+find_package(spdlog REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(P2300 REQUIRED)
-
-message(STATUS "Found p2300 target: ${p2300_TARGET}")
 
 add_executable(stdexec-tests
   tests/main.cpp
@@ -56,7 +49,7 @@ target_link_libraries(stdexec-tests
 target_link_libraries(stdexec-tests PRIVATE spdlog::spdlog)
 target_link_libraries(stdexec-tests PRIVATE nlohmann_json::nlohmann_json)
 target_compile_features(stdexec-tests PRIVATE cxx_std_20)
-# target_include_directories(stdexec-tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 include(CTest)
-add_test(NAME stdexec-tests COMMAND stdexec-tests)
+include(Catch)
+catch_discover_tests(stdexec-tests)
