@@ -40,10 +40,10 @@ jobs:
         run: |
           git clone https://github.com/hollykbuck/stdexec.git
           cd stdexec
-          git checkout 5854e8205248ccbf1b93c3c37b22eeaabf6038f7
+          git checkout 086ccb28f85dcd7103247b6b56db540083e3a556
           conan export .
           cd ..
-          conan install . --build=missing -s build_type=Release -s compiler.cppstd=20  -c="tools.cmake.cmaketoolchain:generator=Ninja"
+          conan install . --build=missing -s build_type=Release -s compiler.cppstd=20  -c="tools.cmake.cmaketoolchain:generator=Ninja" -c "tools.build:skip_test=True"
 
       - name: Configure CMake
         run: |

@@ -48,8 +48,18 @@ target_link_libraries(stdexec-tests
 
 target_link_libraries(stdexec-tests PRIVATE spdlog::spdlog)
 target_link_libraries(stdexec-tests PRIVATE nlohmann_json::nlohmann_json)
+# MUST enable header only mode to prevent link error, query_parallel_scheduler_backend 
+# is a weak symbol
+# this is a workaround
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  find_package(TBB QUIET)
+  if(NOT TBB_FOUND)
+    target_compile_definitions(stdexec-tests PRIVATE STDEXEC_PARALLEL_SCHEDULER_HEADER_ONLY)
+  endif()
+endif()
 target_compile_features(stdexec-tests PRIVATE cxx_std_20)
 
+set(BUILD_TESTING ON CACHE BOOL "" FORCE)
 include(CTest)
 include(Catch)
 catch_discover_tests(stdexec-tests)
