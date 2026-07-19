@@ -16,7 +16,7 @@ TEST_CASE("static_thread_pool scheduler is a valid scheduler", "[custom_schedule
 }
 
 TEST_CASE("inline_scheduler runs on current thread", "[custom_scheduler]") {
-  exec::inline_scheduler sch{};
+  stdexec::inline_scheduler sch{};
 
   std::thread::id caller = std::this_thread::get_id();
   std::thread::id worker;
