@@ -60,9 +60,21 @@ struct then_sender {
   S s_;
   F f_;
 
+  template <class Fn, class... Args>
+  struct __set_value_result;
+
+  template <class Fn>
+  struct __set_value_result<Fn> {
+    using type = ex::completion_signatures<ex::set_value_t()>;
+  };
+
+  template <class Fn, class Arg0, class... Args>
+  struct __set_value_result<Fn, Arg0, Args...> {
+    using type = ex::completion_signatures<ex::set_value_t(std::invoke_result_t<Fn, Arg0, Args...>)>;
+  };
+
   template <class... Args>
-  using _set_value_t =
-    ex::completion_signatures<ex::set_value_t(std::invoke_result_t<F, Args...>)>;
+  using _set_value_t = typename __set_value_result<F, Args...>::type;
 
   template <class... Env>
   using _completions_t = ex::__transform_completion_signatures_t<

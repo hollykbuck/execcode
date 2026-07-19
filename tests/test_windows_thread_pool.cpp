@@ -1,10 +1,12 @@
 #include <catch2/catch_test_macros.hpp>
 #include <stdexec/execution.hpp>
 #include <stdexec/stop_token.hpp>
-#include <exec/windows/windows_thread_pool.hpp>
 #include <atomic>
 
 namespace ex = stdexec;
+
+#ifdef _WIN32
+#include <exec/windows/windows_thread_pool.hpp>
 
 TEST_CASE("windows_thread_pool default constructs", "[win]") {
   exec::windows_thread_pool pool{};
@@ -93,3 +95,5 @@ TEST_CASE("windows_thread_pool supports bulk", "[win]") {
 
   REQUIRE(count.load() == N);
 }
+
+#endif // _WIN32
