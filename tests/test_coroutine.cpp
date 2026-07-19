@@ -1,7 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
+#include <exec/static_thread_pool.hpp>
 #include <stdexec/execution.hpp>
 
 #include <optional>
+#include <thread>
 
 namespace ex = stdexec;
 
@@ -106,4 +108,65 @@ TEST_CASE("affine adaptor syntax", "[coroutine][affine]") {
     ex::just(42) | ex::affine() | ex::then([](int x) { return x; })
   ).value();
   REQUIRE(v == 42);
+}
+
+// =============================================================================
+// Scheduler switching with coroutines
+//
+// NOTE: co_await schedule(pool_sch) inside task<T> does NOT switch threads.
+//   task<T>::await_transform wraps every co_awaited sender with affine(),
+//   which inserts finally(sender, unstoppable(schedule(task_scheduler))).
+//   The task_scheduler is backed by sync_wait's run_loop, which runs on the
+//   caller thread — so the continuation always resumes on the caller.
+//
+// To switch execution context, use starts_on / continues_on / on at the
+// pipeline level (wrapping the task), not co_await schedule inside.
+// =============================================================================
+
+TEST_CASE("continues_on transfers completion to pool thread", "[coroutine][scheduler]") {
+  exec::static_thread_pool pool{1};
+  auto pool_sch = pool.get_scheduler();
+
+  std::thread::id main_id = std::this_thread::get_id();
+
+  // continues_on runs the sender on the caller, then delivers its completion
+  // on the pool. The then() after continues_on runs on the pool thread.
+  bool on_pool = false;
+  ex::sync_wait(
+    ex::continues_on(ex::just(42), pool_sch)
+    | ex::then([&](int) { on_pool = std::this_thread::get_id() != main_id; })
+  );
+  REQUIRE(on_pool);
+}
+
+TEST_CASE("continues_on with coroutine completes and transfers back", "[coroutine][scheduler]") {
+  exec::static_thread_pool pool{1};
+  auto pool_sch = pool.get_scheduler();
+
+  auto coro = []() -> ex::task<int> {
+    co_return 42;
+  };
+
+  // continues_on(coro(), pool_sch) runs the coroutine on the caller, then
+  // delivers the completion on the pool. The completion eventually reaches
+  // sync_wait's receiver on the caller thread.
+  auto [v] = ex::sync_wait(
+    ex::continues_on(coro(), pool_sch)
+  ).value();
+  REQUIRE(v == 42);
+}
+
+TEST_CASE("sender pipeline switches thread via schedule", "[coroutine][scheduler]") {
+  exec::static_thread_pool pool{1};
+  auto pool_sch = pool.get_scheduler();
+
+  std::thread::id main_id = std::this_thread::get_id();
+  std::thread::id work_id;
+
+  // Plain sender pipeline (no task<T>) switches thread.
+  ex::sync_wait(
+    ex::schedule(pool_sch)
+    | ex::then([&] { work_id = std::this_thread::get_id(); })
+  );
+  REQUIRE(work_id != main_id);
 }
