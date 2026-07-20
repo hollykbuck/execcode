@@ -72,15 +72,15 @@ TEST_CASE("server starts_on reads on specified scheduler", "[server][on]") {
     std::atomic<std::thread::id> exec_tid{};
     auto main_tid = std::this_thread::get_id();
 
-    auto [len] = ex::sync_wait(
-        ex::starts_on(io_sched,
-            ex::just(0, buffer.data(), buffer.size())
-            | ex::then([&](int, char* buf, size_t sz) {
-                exec_tid.store(std::this_thread::get_id());
-                return legacy_read_from_socket(0, buf, sz);
-            })
-        )
-    ).value();
+    ex::sender auto snd = ex::starts_on(io_sched,
+        ex::just(0, buffer.data(), buffer.size())
+        | ex::then([&](int, char* buf, size_t sz) {
+            exec_tid.store(std::this_thread::get_id());
+            return legacy_read_from_socket(0, buf, sz);
+        })
+    );
+
+    auto [len] = ex::sync_wait(std::move(snd)).value();
 
     REQUIRE(len > 0);
     REQUIRE(exec_tid.load() != main_tid);
@@ -96,20 +96,20 @@ TEST_CASE("server continues_on transfers to work scheduler", "[server][on]") {
     std::atomic<std::thread::id> io_tid{};
     std::atomic<std::thread::id> work_tid{};
 
-    auto [len] = ex::sync_wait(
-        ex::starts_on(io_sched,
-            ex::just(0, buffer.data(), buffer.size())
-            | ex::then([&](int, char* buf, size_t sz) {
-                io_tid.store(std::this_thread::get_id());
-                return legacy_read_from_socket(0, buf, sz);
-            })
-        )
-        | ex::continues_on(work_sched)
-        | ex::then([&](size_t sz) {
-            work_tid.store(std::this_thread::get_id());
-            return sz;
+    ex::sender auto snd = ex::starts_on(io_sched,
+        ex::just(0, buffer.data(), buffer.size())
+        | ex::then([&](int, char* buf, size_t sz) {
+            io_tid.store(std::this_thread::get_id());
+            return legacy_read_from_socket(0, buf, sz);
         })
-    ).value();
+    )
+    | ex::continues_on(work_sched)
+    | ex::then([&](size_t sz) {
+        work_tid.store(std::this_thread::get_id());
+        return sz;
+    });
+
+    auto [len] = ex::sync_wait(std::move(snd)).value();
 
     REQUIRE(len > 0);
     REQUIRE(io_tid.load() != work_tid.load());
