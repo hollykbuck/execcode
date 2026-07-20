@@ -1,5 +1,7 @@
 # exec code samples
 
+[![CI Build](https://github.com/hollykbuck/execcode/actions/workflows/ci.yml/badge.svg)](https://github.com/hollykbuck/execcode/actions/workflows/ci.yml)
+
 This is the sample code repo for tutorial
 https://hollykbuck.github.io/exec/
 
