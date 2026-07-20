@@ -6,22 +6,24 @@
 namespace ex = stdexec;
 
 TEST_CASE("just creates an immediate-value sender", "[basics][just]") {
-  auto [v] = ex::sync_wait(ex::just(42)).value();
+  ex::sender auto snd = ex::just(42);
+  auto [v] = ex::sync_wait(std::move(snd)).value();
   REQUIRE(v == 42);
 }
 
 TEST_CASE("just with multiple values", "[basics][just]") {
-  auto [a, b, c] = ex::sync_wait(ex::just(1, 2.0, 3)).value();
+  ex::sender auto snd = ex::just(1, 2.0, 3);
+  auto [a, b, c] = ex::sync_wait(std::move(snd)).value();
   REQUIRE(a == 1);
   REQUIRE(b == Catch::Approx(2.0));
   REQUIRE(c == 3);
 }
 
 TEST_CASE("just_error sends an error", "[basics][just_error]") {
-  auto opt = ex::sync_wait(
+  ex::sender auto snd = 
     ex::just_error(std::make_exception_ptr(std::runtime_error{"test"}))
-      | ex::upon_error([](std::exception_ptr) { return -1; })
-  );
+      | ex::upon_error([](std::exception_ptr) { return -1; });
+  auto opt = ex::sync_wait(std::move(snd));
   REQUIRE(opt.has_value());
   auto [v] = opt.value();
   REQUIRE(v == -1);
