@@ -32,6 +32,7 @@ set(STDEXEC_TEST_SOURCES
   tests/test_intro_scan.cpp
   tests/test_intro_socket.cpp
   tests/test_custom_scheduler.cpp
+  tests/test_tag_of.cpp
   tests/test_env_query.cpp
   tests/test_domain.cpp
   tests/test_cpo.cpp
