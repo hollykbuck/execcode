@@ -64,3 +64,8 @@ Start with `test_basics.cpp` for the basic sender pipeline pattern, then follow 
 | 32 | `test_async_mutex_v2.cpp` | async_mutex v2 (with cancellation) |
 | 33 | `test_async_pass.cpp` | async_pass synchronous channel |
 | 34 | `test_async_manual_reset_event.cpp` | async_manual_reset_event |
+
+## License
+
+This project is licensed under the [GNU General Public License v3.0](LICENSE).
+
